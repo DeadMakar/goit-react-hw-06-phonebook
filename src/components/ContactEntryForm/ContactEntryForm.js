@@ -2,8 +2,12 @@ import { nanoid } from 'nanoid';
 import * as Yup from 'yup';
 import { Formik, Field } from 'formik';
 import { StyledForm, Error, Title } from './ContactEntryForm.styled';
+import { useDispatch, useSelector } from 'react-redux';
 
-export const ContactEntryForm = ({ onSubmit }) => {
+export const ContactEntryForm = () => {
+  const dispatch = useDispatch();
+  const contacts = useSelector(state => state.contacts.contacts);
+
   const validationSchema = Yup.object({
     name: Yup.string().required('Name is required'),
     number: Yup.string()
@@ -28,6 +32,14 @@ export const ContactEntryForm = ({ onSubmit }) => {
     }
   };
 
+  const isContactExists = (name, number) => {
+    return contacts.some(
+      contact =>
+        contact.name.toLowerCase() === name.toLowerCase() ||
+        contact.number === number
+    );
+  };
+
   const handlePhoneChange = (e, setFieldValue) => {
     const { value } = e.target;
     const formattedValue = formatPhoneNumber(value);
@@ -35,7 +47,17 @@ export const ContactEntryForm = ({ onSubmit }) => {
   };
 
   const handleSubmit = (values, { resetForm }) => {
-    onSubmit({ ...values, id: nanoid() });
+    const { name, number } = values;
+
+    if (isContactExists(name, number)) {
+      alert('Contact with the same name or number already exists!');
+      return;
+    }
+
+    dispatch({
+      type: 'contacts/addContact',
+      payload: { id: nanoid(), ...values },
+    });
     resetForm();
   };
 
