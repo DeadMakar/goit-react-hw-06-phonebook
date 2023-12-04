@@ -6,10 +6,11 @@ import {
   StyledDeleteButton,
 } from './ContactList.styled';
 import { deleteContact } from 'redux/contactsSlice';
+import { selectContacts, selectFilters } from 'redux/selectors';
 
 export const ContactList = () => {
-  const contacts = useSelector(state => state.contacts.contacts);
-  const filter = useSelector(state => state.filter.filter);
+  const contacts = useSelector(selectContacts);
+  const filter = useSelector(selectFilters);
   const dispatch = useDispatch();
 
   const filteredContacts = contacts.filter(contact =>
